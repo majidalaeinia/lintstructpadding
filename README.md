@@ -19,3 +19,7 @@ go build
 ```bash
 ./lintstructpadding --fix ./examples/fileone.go
 ```
+
+### TODO
+- [ ] Add tests
+- [ ] Support a whole source instead of single files
