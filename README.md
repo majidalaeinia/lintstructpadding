@@ -20,6 +20,16 @@ go build
 ./lintstructpadding --fix ./examples/fileone.go
 ```
 
+### Run the Linter in the Current Directory
+```bash
+./lintstructpadding
+```
+
+### Fix All .go Files in the Current Directory
+```bash
+./lintstructpadding --fix
+```
+
 ### TODO
 - [ ] Add tests
-- [ ] Support a whole source instead of single files
+- [ ] Remove blank lines on struct fixing
