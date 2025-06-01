@@ -7,15 +7,17 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 )
 
 type FieldInfo struct {
+	Name     string
 	Field    *ast.Field
 	TypeSize int
-	Name     string
 }
 
 func getTypeSize(expr ast.Expr) int {
@@ -313,28 +315,81 @@ func formatType(expr ast.Expr) string {
 	return "unknown"
 }
 
+func collectGoFiles(root string) ([]string, error) {
+	var files []string
+	err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() && (d.Name() == "vendor" || d.Name() == "testdata" || strings.HasPrefix(d.Name(), ".")) {
+			return filepath.SkipDir
+		}
+		if !d.IsDir() && strings.HasSuffix(d.Name(), ".go") && !strings.HasSuffix(d.Name(), "_test.go") {
+			files = append(files, path)
+		}
+		return nil
+	})
+	return files, err
+}
+
+func pwd() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("error finding current working directory:", err)
+		return "", err
+	}
+	return dir, nil
+}
+
 func main() {
 	var fix bool
 	flag.BoolVar(&fix, "fix", false, "automatically fix struct field ordering issues")
 	flag.Parse()
 
-	if flag.NArg() < 1 {
-		fmt.Println("Usage: lintstructpadding [--fix] <go-file>")
-		fmt.Println("  --fix    automatically fix struct field ordering issues")
-		os.Exit(1)
-	}
-
-	filename := flag.Arg(0)
-
+	targets := flag.Args()
+	var files []string
 	var err error
-	if fix {
-		err = fixStructsInFile(filename)
+
+	cwd, _ := pwd()
+	if len(targets) == 0 {
+		// Default: process all .go files in current directory
+		files, err = collectGoFiles(cwd)
+		if err != nil {
+			fmt.Printf("Failed to collect Go files: %v\n", err)
+			os.Exit(1)
+		}
 	} else {
-		err = lintFile(filename)
+		info, err := os.Stat(targets[0])
+		if err != nil {
+			fmt.Printf("Invalid path: %v\n", err)
+			os.Exit(1)
+		}
+
+		if info.IsDir() {
+			files, err = collectGoFiles(targets[0])
+			if err != nil {
+				fmt.Printf("Failed to collect Go files from directory: %v\n", err)
+				os.Exit(1)
+			}
+		} else {
+			files = []string{targets[0]}
+		}
 	}
 
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+	hadIssues := false
+	for _, file := range files {
+		if fix {
+			err = fixStructsInFile(file)
+		} else {
+			err = lintFile(file)
+		}
+		if err != nil {
+			hadIssues = true
+			fmt.Printf("Error in %s: %v\n", file, err)
+		}
+	}
+
+	if hadIssues {
 		os.Exit(1)
 	}
 }
