@@ -1,8 +1,8 @@
 # Lint Struct Padding
 
 # What's this?
-You can read [this article](https://kushallabs.com/understanding-struct-padding-in-go-in-depth-guide-ed70c0432c63) to know more about performance improvement on golang structs.
-This linter helps you find (and fix) the ordering of your golang structs, whether it's a single file or all your source code.
+You can read [this article](https://kushallabs.com/understanding-struct-padding-in-go-in-depth-guide-ed70c0432c63) to know more about performance improvement on golang structs.  
+This linter helps you find (and fix) the ordering issues of your golang structs fields.
 
 # Installation
 ```bash
