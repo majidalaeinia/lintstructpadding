@@ -38,3 +38,5 @@ go build
 - [ ] Add tests
 - [ ] Remove blank lines on struct fixing
 - [ ] Improve README file with a terminal GIF showing what it does
+- [ ] Improve installation
+
