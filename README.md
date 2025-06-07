@@ -6,32 +6,36 @@ This linter helps you find (and fix) the ordering issues of your golang structs 
 
 # Installation
 ```bash
-git clone git@github.com:majidalaeinia/lintstructpadding.git
+go install github.com/majidalaeinia/lintstructpadding@latest
 ```
 
 ```bash
-cd lintstructpadding
-go build
+sudo mv $(go env GOPATH)/bin/lintstructpadding /usr/bin
 ```
 
 ### Run the Linter
+
+#### specific file
 ```bash
-./lintstructpadding ./examples/fileone.go
+lintstructpadding /path/to/a/singlefile.go
 ```
 
-### Fix a Sample File
+#### complete source code
 ```bash
-./lintstructpadding --fix ./examples/fileone.go
+cd /path/to/your/source/code
+lintstructpadding
 ```
 
-### Run the Linter in the Current Directory
+### Fix Struct Padding
+#### specific file
 ```bash
-./lintstructpadding
+lintstructpadding --fix /path/to/a/singlefile.go
 ```
 
-### Fix All .go Files in the Current Directory
+#### complete source code
 ```bash
-./lintstructpadding --fix
+cd /path/to/your/source/code
+lintstructpadding --fix
 ```
 
 ### TODO
